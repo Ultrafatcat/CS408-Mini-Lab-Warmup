@@ -1,27 +1,61 @@
-<form (ngSubmit)="loadAssignments()">
-  <select name="course" [(ngModel)]="selectedCourseId">
-    <option [ngValue]="null">Choose a course...</option>
-    @for (course of courses(); track course.id) {
-      <option [value]="course.id">{{ course.name }}</option>
-    }
-  </select>
-  <button type="submit" [disabled]="!selectedCourseId() || loading()">
-    Load assignments
-  </button>
-</form>
+<div class="container py-4">
+  <h1 class="h3 mb-3">Canvas Assignment Tracker</h1>
 
-@if (loading()) {
-  <p>Loading...</p>
-}
+  <form class="row g-2 mb-4" (ngSubmit)="loadAssignments()">
+    <div class="col-12 col-md-8">
+      <select class="form-select" name="course" [(ngModel)]="selectedCourseId">
+        <option [ngValue]="null">Choose a course...</option>
+        @for (course of courses(); track course.id) {
+          <option [value]="course.id">{{ course.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-12 col-md-4">
+      <button class="btn btn-primary w-100" type="submit"
+              [disabled]="!selectedCourseId() || loading()">
+        Load assignments
+      </button>
+    </div>
+  </form>
 
-@if (errorMessage()) {
-  <p>{{ errorMessage() }}</p>
-}
-
-<p>Assignments loaded: {{ assignments().length }}</p>
-
-<ul>
-  @for (assignment of assignments(); track assignment.id) {
-    <li>{{ assignment.name }}</li>
+  @if (errorMessage()) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
   }
-</ul>
+
+  @if (loading()) {
+    <div class="d-flex align-items-center gap-2">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <span>Loading assignments...</span>
+    </div>
+  }
+
+  @if (sortedAssignments().length > 0) {
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>Due</th>
+            <th>Points</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (assignment of sortedAssignments(); track assignment.id) {
+            @let u = urgency(assignment);
+            <tr>
+              <td>
+                <a [href]="assignment.html_url" target="_blank" rel="noopener">
+                  {{ assignment.name }}
+                </a>
+              </td>
+              <td>{{ assignment.due_at ? (assignment.due_at | date: 'EEE, MMM d, h:mm a') : '—' }}</td>
+              <td>{{ assignment.points_possible ?? '—' }}</td>
+              <td><span class="badge" [class]="u.badgeClass">{{ u.label }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
