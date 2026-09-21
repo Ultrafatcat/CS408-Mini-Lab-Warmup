@@ -106,7 +106,9 @@ What I would like to improve is how my app lists courses. Right now the dropdown
 ## Sources
 - Canvas LMS REST API documentation (Courses, Assignments, and pagination): https://canvas.instructure.com/doc/api/
 - Angular documentation: https://angular.dev
+- Getting started with Angular: https://angularstart.com/modules/angular-getting-started/1/
 - Express documentation: https://expressjs.com
+- Quick start guide to dotenv: https://www.newline.co/@goatandsheep/a-quick-start-guide-to-dotenv--788c3807
 - Bootstrap documentation: https://getbootstrap.com
 - MDN Web Docs (fetch, URL): https://developer.mozilla.org
 - AI assistance: I used Claude as a tutor throughout this project. It explained concepts, guided me through setup and debugging, reviewed my code, and provided code for parts of the project, including the pagination helper in canvas.js, the assignments route, and the tracker component and template. I tested and adapted that code. It also drafted the setup instructions and API table in this README, and gave feedback on the clarity and grammar of my reflection, which I wrote myself. GitHub Copilot autocompleted some lines in VS Code.
