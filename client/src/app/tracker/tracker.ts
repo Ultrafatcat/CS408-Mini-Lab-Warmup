@@ -61,6 +61,7 @@ export class Tracker {
 
   // Decides the label and Bootstrap badge color for one assignment
   protected urgency(assignment: Assignment): { label: string; badgeClass: string } {
+    // check submitted first so a finished assignment never shows as overdue
     const state = assignment.submission?.workflow_state;
     if (state === 'submitted' || state === 'graded' || state === 'pending_review') {
       return { label: 'Submitted', badgeClass: 'text-bg-success' };
@@ -77,7 +78,7 @@ export class Tracker {
     }
     return { label: 'Upcoming', badgeClass: 'text-bg-primary' };
   }
-
+  
   private showError(err: HttpErrorResponse) {
     if (err.status === 0) {
       this.errorMessage.set("Can't reach the server. Is Express running?");

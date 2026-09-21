@@ -8,12 +8,7 @@ const { canvasGetAll } = require('./canvas');
 const app = express();
 app.use(cors());
 
-app.get('/api/hello', (req, res) => {
-    res.json({ 
-        message: 'Hello from the server!' 
-    });
-});
-
+// my active courses, used to fill the dropdown
 app.get('/api/courses', async (req, res) => {
     try {
         const url = `${process.env.CANVAS_BASE_URL}/api/v1/courses?enrollment_state=active`;
@@ -24,15 +19,18 @@ app.get('/api/courses', async (req, res) => {
     }
 });
 
+// assignments for one course, sorted by due date
 app.get('/api/courses/:courseId/assignments', async (req, res) => {
     try {
         const { courseId } = req.params;
+        // course ids are only digits, so reject anything else before calling canvass
         if (!courseId.match(/^\d+$/)) {
             return res.status(400).json({ error: 'Invalid course ID' });
         }
 
         const url = new URL(`${process.env.CANVAS_BASE_URL}/api/v1/courses/${courseId}/assignments`);
         url.searchParams.append('order_by', 'due_at');
+        // include[] asks canvas to add whether i've submitted each one
         url.searchParams.append('include[]', 'submission');
 
         const assignments = await canvasGetAll(url.toString());

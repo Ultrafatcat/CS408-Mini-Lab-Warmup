@@ -1,10 +1,14 @@
+// makes one request to canvas and returns the data plus the link header
+// (the link header is how we find the next page)
 async function canvasRequest(url) {
+    // stop early with a clear message if the .env values are missing
     const token = process.env.CANVAS_API_TOKEN;
     if (!token) {
         const error = new Error('Canvas API token is not set in environment variables.');
         error.status = 500;
         throw error;
     }
+    // couldn't reach canvas at all (wifi down, wrong url, etc)
     const baseUrl = process.env.CANVAS_BASE_URL;
     if (!baseUrl) {
         const error = new Error('Canvas base URL is not set in environment variables.');
@@ -27,6 +31,7 @@ async function canvasRequest(url) {
         err.status = 502;
         throw err;
     }
+    // canvas answered, but with an error (bad token, no permission, not found)
     if (!response.ok) {
         
          let canvasMessage = '';
@@ -63,7 +68,8 @@ async function canvasRequest(url) {
 
     return { data: data, linkHeader: linkHeader };
 }
-
+// canvas puts the next page's url in the link header, like <url>; rel="next"
+// returns that url, or null if this was the last page
 function getNextUrl(linkHeader) {
     if (!linkHeader) {
         return null;
@@ -81,8 +87,9 @@ function getNextUrl(linkHeader) {
 
     return null;
 }
-
+// keeps asking for pages until there isn't a next one, then returns everything in one list
 async function canvasGetAll(startUrl) {
+    // ask for 100 per page unless the url already says otherwise (fewer requests)
     const firstUrl = new URL(startUrl);
     if (!firstUrl.searchParams.has('per_page')) {
         firstUrl.searchParams.set('per_page', '100');
@@ -95,6 +102,7 @@ async function canvasGetAll(startUrl) {
 
     while (currentUrl && pageCount < MAX_PAGES) {
         const { data, linkHeader } = await canvasRequest(currentUrl);
+        // spread so each item gets added, not the whole array as one item
         results.push(...data);
         currentUrl = getNextUrl(linkHeader);
         pageCount++;
