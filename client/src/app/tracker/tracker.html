@@ -1,0 +1,27 @@
+<form (ngSubmit)="loadAssignments()">
+  <select name="course" [(ngModel)]="selectedCourseId">
+    <option [ngValue]="null">Choose a course...</option>
+    @for (course of courses(); track course.id) {
+      <option [value]="course.id">{{ course.name }}</option>
+    }
+  </select>
+  <button type="submit" [disabled]="!selectedCourseId() || loading()">
+    Load assignments
+  </button>
+</form>
+
+@if (loading()) {
+  <p>Loading...</p>
+}
+
+@if (errorMessage()) {
+  <p>{{ errorMessage() }}</p>
+}
+
+<p>Assignments loaded: {{ assignments().length }}</p>
+
+<ul>
+  @for (assignment of assignments(); track assignment.id) {
+    <li>{{ assignment.name }}</li>
+  }
+</ul>
